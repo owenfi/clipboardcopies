@@ -77,7 +77,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         let filename = DirPath.appendingPathComponent("\(timestamp).txt")
                         
                         do {
-                            try newClipboardValue.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
+                            let output = "\(newClipboardValue)\n"
+                            try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
                             print ("Wrote clipboard file: \(filename)")
                         } catch {
                             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
