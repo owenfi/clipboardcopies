@@ -35,7 +35,5 @@ class ViewController: NSViewController {
         print("quit!")
         NSApp.terminate(self)
     }
-
-
 }
 

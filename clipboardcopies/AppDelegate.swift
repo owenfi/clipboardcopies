@@ -48,23 +48,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         if let newClipboardValue = pasteBoard.string(forType: .string) {
             //print("\(lastClipboardContents) vs \(newClipboardValue)")
-            
             if (!(lastClipboardContents == newClipboardValue)) {
                 lastClipboardContents = newClipboardValue
-                print("clipboard was updated")
+                print("Clipboard was updated")
                 
-                //        let homeDirURL = URL(fileURLWithPath: NSHomeDirectory())
                 let homeDirURL = FileManager.default.homeDirectoryForCurrentUser
-                //print ("home is at: \(homeDirURL)") // we could disable sandboxing to put this where we actually want to...
-                //        let DocumentDirectory = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
-                let DirPath = homeDirURL.appendingPathComponent("CLIPBOARDS")
+                // Above goes into an app sandbox documents directory
+                // print ("home is at: \(homeDirURL)")
+                // we could disable sandboxing to put this where we actually want to... ~/.clipboards
+                
+                // Another alternate approach:
+                // let DocumentDirectory = NSURL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+                
+                let clipboardDirectoryPath = homeDirURL.appendingPathComponent("CLIPBOARDS")
                 do {
-                    try FileManager.default.createDirectory(atPath: DirPath.path, withIntermediateDirectories: true, attributes: nil)
-                }
-                catch let error as NSError {
+                    try FileManager.default.createDirectory(atPath: clipboardDirectoryPath.path, withIntermediateDirectories: true, attributes: nil)
+                } catch let error as NSError {
                     print("Unable to create directory \(error.debugDescription)")
                 }
-                print("Dir Path = \(DirPath)")
                 
                 if let newClipboardValue = pasteBoard.string(forType: .string) {
                     if newClipboardValue.isValidURL {
@@ -74,21 +75,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         let format = DateFormatter()
                         format.dateFormat = "yyyy-MM-dd+HH-mm-ss"
                         let timestamp = format.string(from: date)
-                        let filename = DirPath.appendingPathComponent("\(timestamp).txt")
+                        let filename = clipboardDirectoryPath.appendingPathComponent("\(timestamp).txt")
                         
                         do {
                             let output = "\(newClipboardValue)\n"
                             try output.write(to: filename, atomically: true, encoding: String.Encoding.utf8)
                             print ("Wrote clipboard file: \(filename)")
-                        } catch {
+                        } catch let error as NSError {
                             // failed to write file – bad permissions, bad filename, missing permissions, or more likely it can't be converted to the encoding
-                            print(error)
+                            print("Unable to write the URL to a file \(error)")
                         }
                     } else {
                         //print("Clipboard item: \(newClipboardValue) is not a URL")
                     }
-                } else {
-                    print ("OWEN: nope")
                 }
             }
         }
