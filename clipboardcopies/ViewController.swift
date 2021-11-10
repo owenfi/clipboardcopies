@@ -30,6 +30,11 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
+    
+    @IBAction func quitThisApp(sender: Any?) {
+        print("quit!")
+        NSApp.terminate(self)
+    }
 
 
 }
